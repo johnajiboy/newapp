@@ -29,8 +29,12 @@ jobs:
         aws-region: ${{ secrets.AWS_REGION }}
 
     - name: Deploy to AWS EC2
+      env:
+        SSH_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
       run: |
-        ssh -o StrictHostKeyChecking=no ${{ secrets.AWS_INSTANCE_IP }} << 'EOF'
+        echo "$SSH_KEY" > /tmp/ssh_key.pem
+        chmod 600 /tmp/ssh_key.pem
+        ssh -i /tmp/ssh_key.pem -o StrictHostKeyChecking=no ec2-user@3.83.158.138 << 'EOF'
           cd /var/www/html
           git pull
           composer install --no-dev
